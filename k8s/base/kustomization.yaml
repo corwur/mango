@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - spark-deployment.yaml
+  - microbrewery-deployment.yaml
+  - data-persistentvolumeclaim.yaml
+  - spark-master-service.yaml
+  - microbrewery-service.yaml
+
+configMapGenerator:
+  - name: microbrewery-config

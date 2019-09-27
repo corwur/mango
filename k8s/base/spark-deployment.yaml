@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: spark-master
+  name: spark
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: spark-master
+    spec:
+      containers:
+        - env:
+            - name: INIT_DAEMON_STEP
+              value: setup_spark
+          image: bde2020/spark-master:2.4.0-hadoop2.7
+          name: spark-master
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+          resources: {}
+        - env:
+            - name: SPARK_MASTER
+              value: spark://spark-master:7077
+          image: bde2020/spark-worker:2.4.0-hadoop2.7
+          name: spark-worker-1
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: data
+        - env:
+            - name: SPARK_MASTER
+              value: spark://spark-master:7077
+          image: bde2020/spark-worker:2.4.0-hadoop2.7
+          name: spark-worker-2
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      restartPolicy: Always
+      volumes:
+        - name: data
+          projected:
+            sources:
+              - configMap:
+                  name: microbrewery-data
+status: {}
